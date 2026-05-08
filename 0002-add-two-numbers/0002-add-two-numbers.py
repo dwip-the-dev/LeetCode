@@ -1,25 +1,33 @@
 class Solution:
     def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
-        dummy = curr = ListNode(0)
+        head = l1
+        prev = None
         carry = 0
         
+        # Add l2 into l1
         while l1 and l2:
-            carry, digit = divmod(l1.val + l2.val + carry, 10)
-            curr.next = ListNode(digit)
-            curr = curr.next
+            total = l1.val + l2.val + carry
+            l1.val = total % 10
+            carry = total // 10
+            prev = l1
             l1 = l1.next
             l2 = l2.next
         
-        # Only one list remains (or none)
-        remaining = l1 or l2
-        while remaining:
-            carry, digit = divmod(remaining.val + carry, 10)
-            curr.next = ListNode(digit)
-            curr = curr.next
-            remaining = remaining.next
+        # Attach remaining l2 to l1 if l1 ended first
+        if l2:
+            prev.next = l2
+            l1 = l2
         
-        # Final carry
+        # Propagate carry through remaining nodes
+        while carry and l1:
+            total = l1.val + carry
+            l1.val = total % 10
+            carry = total // 10
+            prev = l1
+            l1 = l1.next
+        
+        # Only allocate if absolutely necessary
         if carry:
-            curr.next = ListNode(1)
+            prev.next = ListNode(carry)  # Only new node ever created
         
-        return dummy.next
+        return head
